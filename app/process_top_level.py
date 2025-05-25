@@ -1,10 +1,10 @@
 from bs4 import Tag
 
-from app.chunk_text import chunk_text
-from app.clean_text import clean_text
+from .chunk_text import chunk_text
+from .clean_text import clean_text, looks_like_nav_page
 
 
-def process_top_level(tag: Tag, items: list):
+async def process_top_level(tag: Tag, items: list):
     allowed_containers = ['div', 'p', 'section', 'article']
 
     if not isinstance(tag, Tag):
@@ -12,11 +12,11 @@ def process_top_level(tag: Tag, items: list):
     if tag.name not in allowed_containers:
         return
 
-    text = clean_text(tag)
-    if not text.strip():
+    text = await clean_text(tag)
+    if not text.strip():  # or await looks_like_nav_page(text):
         return
 
-    for chunk in chunk_text(text):
+    for chunk in await chunk_text(text):
         items.append({
             # "tag": tag.name,
             # "class": tag.get('class', []),

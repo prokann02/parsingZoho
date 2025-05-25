@@ -18,3 +18,9 @@ cd parsingZoho
 pip install -r requirements.txt
 playwright install
 ```
+
+<p><b>3. Start FastAPI:</b></p>
+
+```
+uvicorn main:app --reload
+```

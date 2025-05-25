@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scraping Result</title>
+</head>
+<body>
+    <h1>Scraping Done</h1>
+
+    <p><strong>Start URL:</strong> {{ url }}</p>
+    <p><strong>Depth:</strong> {{ depth }}</p>
+    <p><strong>Saved file:</strong> {{ file_name }}</p>
+
+    <h2>Found items:</h2>
+    <ul>
+        {% for item in results %}
+            <li>{{ item.title }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="/">← Back</a>
+</body>
+</html>

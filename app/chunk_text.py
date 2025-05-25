@@ -1,4 +1,4 @@
-def chunk_text(text, max_len=1000):
+async def chunk_text(text, max_len=1000):
     lines = text.split('\n')
     chunks = []
     current = []

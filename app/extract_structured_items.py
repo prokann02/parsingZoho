@@ -1,22 +1,22 @@
 from bs4 import Tag, BeautifulSoup
 
-from app.process_top_level import process_top_level
+from .process_top_level import process_top_level
 
 
-def extract_structured_items(page):
+async def extract_structured_items(page):
     try:
-        box = page.locator('.ArticleDetailLeftContainer__box')
-        if box.count() == 0:
+        box = await page.locator('.ArticleDetailLeftContainer__box')
+        if await box.count() == 0:
             return []
 
-        html = box.inner_html()
+        html = await box.inner_html()
         soup = BeautifulSoup(html, 'html.parser')
         items = []
 
         # Go only through the upper-level children of the container
         for element in soup.contents:
             if isinstance(element, Tag):
-                process_top_level(tag=element, items=items)
+                await process_top_level(tag=element, items=items)
 
         return items
 

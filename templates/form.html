@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zoho Scraper</title>
+</head>
+<body>
+    <h1>Zoho Scraper</h1>
+
+    {% if error %}
+        <p style="color: red;">Error: {{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <label>Start URL:</label><br>
+        <input type="text" name="url" value="{{ url|default:'' }}"><br><br>
+
+        <label>Depth:</label><br>
+        <input type="number" name="depth" value="{{ depth|default:2 }}"><br><br>
+
+        <button type="submit">Start Scraping</button>
+    </form>
+
+    {% if loading %}
+        <p>Scraping in progress... Please wait...</p>
+    {% endif %}
+</body>
+</html>
