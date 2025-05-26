@@ -5,8 +5,9 @@ from .process_top_level import process_top_level
 
 async def extract_structured_items(page):
     try:
-        box = await page.locator('.ArticleDetailLeftContainer__box')
+        box = page.locator('.ArticleDetailLeftContainer__box')
         if await box.count() == 0:
+            print("[i] No elements found for selector")
             return []
 
         html = await box.inner_html()

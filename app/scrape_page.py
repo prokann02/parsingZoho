@@ -1,17 +1,17 @@
 from .extract_structured_items import extract_structured_items
 from .get_links_from_page import get_links_from_page
-
+import json
 
 async def scrape_page(url, browser, depth=1, visited=None):
     if visited is None:
         visited = set()
 
-    # Avoid revisiting the same URL
     if url in visited:
-        return []
+        return {"results": [], "links": []}
 
     visited.add(url)
     scraped_data = []
+    internal_links = []
 
     page = await browser.new_page()
     try:
@@ -20,27 +20,34 @@ async def scrape_page(url, browser, depth=1, visited=None):
         print(f"Scraping: {url}")
 
         items = await extract_structured_items(page)
+        print(f"[i] Extracted {len(items)} items for {url}")
 
         if items:
             scraped_data.append({
                 "url": url,
                 "items": items
             })
+
+            # Save parted data to JSON file
+            try:
+                with open("scraped_zoho2.json", "r", encoding="utf-8") as f:
+                    existing_data = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                existing_data = []
+            existing_data.extend(scraped_data)
+            with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
+                json.dump(existing_data, f, ensure_ascii=False, indent=2)
         else:
             print(f"[i] Skipping content for hub page: {url}")
 
-        # Continue go through links, if depth > 1
-        if depth > 1:
+        if depth >= 1:
             internal_links = await get_links_from_page(page, url)
-            for link in internal_links:
-                if link not in visited:
-                    # if link == 'https://help.zoho.com/portal/en/kb/crm/getting-started/articles/understand-crm-account':
-                    data = await scrape_page(url=link, depth=depth - 1, visited=visited, browser=browser)
-                    if data:
-                        scraped_data.extend(data)
+            internal_links = [link for link in internal_links if link not in visited]
+            print(f"[i] Found {len(internal_links)} internal links")
 
     except Exception as e:
         print(f"[!] Failed to scrape {url}: {e}")
     finally:
         await page.close()
-    return scraped_data
+
+    return {"results": scraped_data, "links": internal_links}
