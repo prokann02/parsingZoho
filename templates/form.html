@@ -16,9 +16,11 @@
             console.log("URL filled:", isUrlFilled, "Depth selected:", isDepthSelected, "Button disabled:", submitButton.disabled);
         }
 
-        function showLoading() {
+        function showLoading(event) {
+            event.preventDefault(); // Prevent default form submission
             document.getElementById("submit-button").style.display = "none";
             document.getElementById("loading").style.display = "block";
+            document.forms[0].submit(); // Manually submit the form
         }
 
         window.onload = function () {
@@ -38,7 +40,7 @@
 <body>
 <h1>Zoho Scraper</h1>
 
-<form method="POST" action="/scrape" onsubmit="showLoading()" style="margin-bottom: 2em;">
+<form method="POST" action="/scrape" onsubmit="showLoading(event)">
     <label>Start URL:</label><br>
     <input type="text" name="url" value="{{ url or '' }}"><br><br>
 
@@ -52,5 +54,8 @@
 </form>
 
 <p id="loading" style="display:none;">Parsing... Please, wait 🌀</p>
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% endif %}
 </body>
 </html>

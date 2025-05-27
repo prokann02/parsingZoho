@@ -16,31 +16,36 @@ app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 scraping_session = {}
 
-
 @app.get("/", response_class=HTMLResponse)
 async def form_page(request: Request):
     return templates.TemplateResponse(TEMPLATES_FORM_HTML, {"request": request})
 
-
 @app.post("/scrape", response_class=HTMLResponse)
 async def start_scrape(request: Request, url: str = Form(...), depth: int = Form(...)):
-    if not url or not depth:
+    if not url or depth < 0:
         return templates.TemplateResponse(
             TEMPLATES_FORM_HTML,
-            {"request": request, "url": url, "depth": depth}
+            {"request": request, "url": url, "depth": depth, "error": "Please provide a valid URL and depth"}
         )
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        scrape_data = await scrape_page(url, browser=browser, depth=1)
-        results = scrape_data["results"]
-        internal_links = scrape_data["links"]
-        await browser.close()
+        try:
+            scrape_data = await scrape_page(url, browser=browser, depth=1)
+            results = scrape_data["results"]
+            internal_links = scrape_data["links"]
+        except Exception as e:
+            print(f"[!] Error in scrape_page: {e}")
+            results = []
+            internal_links = []
+        finally:
+            await browser.close()
 
-        print(f"[i] Scraped {len(results)} pages, {sum(len(r['items']) for r in results)} items")
+        print(f"[i] Scraped {len(results)} pages, {sum(len(r['items']) for r in results) if results else 0} items")
         for result in results:
             print(f"[i] Page {result['url']} has {len(result['items'])} items")
 
+        # Save results to JSON even if empty
         with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
 
@@ -53,7 +58,15 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
             "links": internal_links
         }
 
-        if internal_links and depth > 1:
+        print(f"[i] Depth: {depth}, Links found: {len(internal_links)}, Redirecting to: {'results' if depth == 0 or not internal_links else 'select_links'}")
+
+        # Always redirect to result.html for depth=0 or no links
+        if depth == 0 or not internal_links:
+            return templates.TemplateResponse(
+                TEMPLATES_RESULT_HTML,
+                {"request": request, "results": results, "links": internal_links}
+            )
+        else:
             return templates.TemplateResponse(
                 TEMPLATES_SELECT_LINKS_HTML,
                 {
@@ -64,12 +77,6 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
                     "max_depth": depth
                 }
             )
-        else:
-            return templates.TemplateResponse(
-                TEMPLATES_RESULT_HTML,
-                {"request": request, "results": results, "links": internal_links}
-            )
-
 
 @app.post("/continue_scrape", response_class=HTMLResponse)
 async def continue_scrape(request: Request, session_id: str = Form(...), selected_links: list = Form(...)):
@@ -88,17 +95,21 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        for link in selected_links:
-            if depth > 0:
-                scrape_data = await scrape_page(link, browser=browser, depth=depth)
-                results.extend(scrape_data["results"])
-                new_internal_links.extend(scrape_data["links"])
-                with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
-                    json.dump(results, f, ensure_ascii=False, indent=2)
-        await browser.close()
+        try:
+            for link in selected_links:
+                if depth > 0:
+                    scrape_data = await scrape_page(link, browser=browser, depth=depth)
+                    results.extend(scrape_data["results"])
+                    new_internal_links.extend(scrape_data["links"])
+                    with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
+                        json.dump(results, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"[!] Error in continue_scrape: {e}")
+        finally:
+            await browser.close()
 
     print(
-        f"[i] After continuation at depth {current_depth}: {len(results)} pages, {sum(len(r['items']) for r in results)} items")
+        f"[i] After continuation at depth {current_depth}: {len(results)} pages, {sum(len(r['items']) for r in results) if results else 0} items")
     print(f"[i] Found {len(new_internal_links)} new internal links")
 
     visited = {r["url"] for r in results}
@@ -125,7 +136,6 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
             TEMPLATES_RESULT_HTML,
             {"request": request, "results": results, "links": new_internal_links}
         )
-
 
 @app.get("/stop_and_get_results", response_class=HTMLResponse)
 async def stop_and_get_results(request: Request, session_id: str):

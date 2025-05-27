@@ -30,16 +30,13 @@
         function showLoading() {
             document.getElementById("submit-button").style.display = "none";
             document.getElementById("loading").style.display = "block";
-            document.getElementById("get-results").disabled = false;
-            {#document.getElementById("get-results").style.display = "block";#}
         }
 
         window.onload = function () {
             document.getElementById("submit-button").style.display = "inline-block";
             document.getElementById("loading").style.display = "none";
-            document.getElementById("get-results").disabled = true;
-            {#document.getElementById("get-results").style.display = "none";#}
-
+            document.getElementById("get-results").style.display = "inline-block"; // Ensure button is visible
+            document.getElementById("get-results").disabled = false; // Ensure button is enabled
 
             const checkboxes = document.querySelectorAll('input[name="selected_links"]');
             checkboxes.forEach(checkbox => checkbox.addEventListener('change', buttonBlock));
@@ -65,9 +62,7 @@
         {% endfor %}
     </ul>
     <button type="submit" id="submit-button" disabled>Scraping</button>
-    <button type="button" id="get-results" disabled
-            onclick="window.location.href='/stop_and_get_results?session_id={{ session_id }}'">Stop and Get Results
-    </button>
+    <button type="button" id="get-results" onclick="window.location.href='/stop_and_get_results?session_id={{ session_id }}'">Stop and Get Results</button>
 </form>
 
 <p id="loading" style="display:none;">Parsing... Please, wait 🌀</p>

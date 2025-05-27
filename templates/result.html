@@ -9,29 +9,27 @@
 
 <button class="download-button" onclick="window.location.href='/download_results'">Download Results</button>
 {% if results %}
-    <p>Results found!</p>
+    <p>Found {{ results|length }} page(s) with content:</p>
+    <ul>
+        {% for result in results %}
+            <li>
+                <strong>URL:</strong> {{ result.url }}<br>
+                <strong>Items:</strong>
+                {% if result.items is iterable and not result.items is string %}
+                    {{ result.items|length }} chunk(s)
+                {% else %}
+                    Invalid or no items found
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 {% else %}
-    <p>No results found.</p>
+    <p>No results found for the provided URL.</p>
+{% endif %}
+{% if error %}
+    <p class="error">{{ error }}</p>
 {% endif %}
 
 <a href="/">← Back</a>
 </body>
 </html>
-
-
-{#{% if results %}#}
-{#    {% for result in results %}#}
-{#        <h2>Page: <a href="{{ result.url }}">{{ result.url }}</a></h2>#}
-{#        {% if "items" in result and result["items"] is iterable and not result["items"] is string %}#}
-{#            <ul>#}
-{#                {% for item in result["items"] %}#}
-{#                    <li>{{ item.text.replace('\n', '<br>') | safe }}</li>#}
-{#                {% endfor %}#}
-{#            </ul>#}
-{#        {% else %}#}
-{#            <p>No items found for this page.</p>#}
-{#        {% endif %}#}
-{#    {% endfor %}#}
-{#{% else %}#}
-{#    <p>No results found.</p>#}
-{#{% endif %}#}
