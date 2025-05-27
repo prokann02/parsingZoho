@@ -48,7 +48,9 @@
     </script>
 </head>
 <body>
-<h1>Select Links to Scrape</h1>
+<h1>Select New Links to Scrape</h1>
+
+<p class="depth-info">New links found at depth {{ current_depth }} of {{ max_depth }}</p>
 
 <form method="POST" action="/continue_scrape" onsubmit="showLoading()">
     <input type="hidden" name="session_id" value="{{ session_id }}">

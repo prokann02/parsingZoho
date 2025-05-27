@@ -47,7 +47,8 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
         session_id = str(uuid.uuid4())
         scraping_session[session_id] = {
             "original_url": url,
-            "depth": depth,
+            "max_depth": depth,
+            "current_depth": 1,
             "results": results,
             "links": internal_links
         }
@@ -55,7 +56,13 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
         if internal_links and depth > 1:
             return templates.TemplateResponse(
                 TEMPLATES_SELECT_LINKS_HTML,
-                {"request": request, "links": internal_links, "session_id": session_id}
+                {
+                    "request": request,
+                    "links": internal_links,
+                    "session_id": session_id,
+                    "current_depth": 1,
+                    "max_depth": depth
+                }
             )
         else:
             return templates.TemplateResponse(
@@ -73,7 +80,9 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
         )
 
     session_data = scraping_session[session_id]
-    depth = session_data["depth"] - 1
+    max_depth = session_data["max_depth"]
+    current_depth = session_data["current_depth"] + 1
+    depth = max_depth - current_depth + 1
     results = session_data["results"]
     new_internal_links = []
 
@@ -88,7 +97,8 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
                     json.dump(results, f, ensure_ascii=False, indent=2)
         await browser.close()
 
-    print(f"[i] After continuation: {len(results)} pages, {sum(len(r['items']) for r in results)} items")
+    print(
+        f"[i] After continuation at depth {current_depth}: {len(results)} pages, {sum(len(r['items']) for r in results)} items")
     print(f"[i] Found {len(new_internal_links)} new internal links")
 
     visited = {r["url"] for r in results}
@@ -96,12 +106,18 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
 
     scraping_session[session_id]["results"] = results
     scraping_session[session_id]["links"] = new_internal_links
-    scraping_session[session_id]["depth"] = depth
+    scraping_session[session_id]["current_depth"] = current_depth
 
     if new_internal_links and depth > 1:
         return templates.TemplateResponse(
             TEMPLATES_SELECT_LINKS_HTML,
-            {"request": request, "links": new_internal_links, "session_id": session_id}
+            {
+                "request": request,
+                "links": new_internal_links,
+                "session_id": session_id,
+                "current_depth": current_depth,
+                "max_depth": max_depth
+            }
         )
     else:
         del scraping_session[session_id]
