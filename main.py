@@ -1,14 +1,18 @@
 import json
 import uuid
+
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from playwright.async_api import async_playwright
+
 from app.scrape_page import scrape_page
-from paths import TEMPLATES_FORM_HTML, TEMPLATES, TEMPLATES_SELECT_LINKS_HTML, TEMPLATES_RESULT_HTML
+from paths import TEMPLATES_FORM_HTML, TEMPLATES, TEMPLATES_SELECT_LINKS_HTML, TEMPLATES_RESULT_HTML, STATIC
 
 app = FastAPI()
 templates = Jinja2Templates(directory=TEMPLATES)
+app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 scraping_session = {}
 
@@ -37,7 +41,6 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
         for result in results:
             print(f"[i] Page {result['url']} has {len(result['items'])} items")
 
-
         with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
 
@@ -57,7 +60,7 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
         else:
             return templates.TemplateResponse(
                 TEMPLATES_RESULT_HTML,
-                {"request": request, "results": results}
+                {"request": request, "results": results, "links": internal_links}
             )
 
 
@@ -72,6 +75,7 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
     session_data = scraping_session[session_id]
     depth = session_data["depth"] - 1
     results = session_data["results"]
+    new_internal_links = []
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -79,19 +83,32 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
             if depth > 0:
                 scrape_data = await scrape_page(link, browser=browser, depth=depth)
                 results.extend(scrape_data["results"])
-
+                new_internal_links.extend(scrape_data["links"])
                 with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
                     json.dump(results, f, ensure_ascii=False, indent=2)
         await browser.close()
 
     print(f"[i] After continuation: {len(results)} pages, {sum(len(r['items']) for r in results)} items")
+    print(f"[i] Found {len(new_internal_links)} new internal links")
 
-    del scraping_session[session_id]
+    visited = {r["url"] for r in results}
+    new_internal_links = list(dict.fromkeys([link for link in new_internal_links if link not in visited]))
 
-    return templates.TemplateResponse(
-        TEMPLATES_RESULT_HTML,
-        {"request": request, "results": results}
-    )
+    scraping_session[session_id]["results"] = results
+    scraping_session[session_id]["links"] = new_internal_links
+    scraping_session[session_id]["depth"] = depth
+
+    if new_internal_links and depth > 1:
+        return templates.TemplateResponse(
+            TEMPLATES_SELECT_LINKS_HTML,
+            {"request": request, "links": new_internal_links, "session_id": session_id}
+        )
+    else:
+        del scraping_session[session_id]
+        return templates.TemplateResponse(
+            TEMPLATES_RESULT_HTML,
+            {"request": request, "results": results, "links": new_internal_links}
+        )
 
 
 @app.get("/stop_and_get_results", response_class=HTMLResponse)
@@ -104,6 +121,7 @@ async def stop_and_get_results(request: Request, session_id: str):
 
     session_data = scraping_session[session_id]
     results = session_data["results"]
+    internal_links = session_data["links"]
 
     with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
@@ -112,7 +130,7 @@ async def stop_and_get_results(request: Request, session_id: str):
 
     return templates.TemplateResponse(
         TEMPLATES_RESULT_HTML,
-        {"request": request, "results": results}
+        {"request": request, "results": results, "links": internal_links}
     )
 
 
@@ -129,5 +147,5 @@ async def download_results():
     except (FileNotFoundError, json.JSONDecodeError):
         return templates.TemplateResponse(
             TEMPLATES_RESULT_HTML,
-            {"request": Request, "results": [], "error": "No results available to download"}
+            {"request": Request, "results": [], "links": [], "error": "No results available to download"}
         )

@@ -2,74 +2,7 @@
 <html>
 <head>
     <title>Zoho Scraper</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fa;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-        label {
-            font-weight: bold;
-            color: #34495e;
-        }
-        input[type="text"] {
-            width: 100%;
-            max-width: 70%;
-            min-width: 25em;
-            padding: 10px;
-            margin: 5px 0 15px;
-            border: 2px solid #3498db;
-            border-radius: 5px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        input[type="text"]:focus {
-            border-color: #2980b9;
-            outline: none;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-        }
-        input[type="radio"] {
-            margin-right: 10px;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-        }
-        button:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-        }
-        button:not(:disabled):hover {
-            background-color: #2980b9;
-        }
-        #loading {
-            text-align: center;
-            font-size: 1.2em;
-            color: #27ae60;
-            margin-top: 15px;
-        }
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/styles.css">
     <script>
         function buttonBlock() {
             const url = document.querySelector('input[name="url"]').value.trim();
@@ -107,7 +40,7 @@
 
 <form method="POST" action="/scrape" onsubmit="showLoading()" style="margin-bottom: 2em;">
     <label>Start URL:</label><br>
-    <input type="text" name="url" value="{{ url or '' }}" style="max-width: 70%; min-width: 25em;"><br><br>
+    <input type="text" name="url" value="{{ url or '' }}"><br><br>
 
     <label>Depth:</label><br>
     <input type="radio" name="depth" value="0" {% if depth == 0 %}checked{% endif %}> Fast (only first page)<br>
@@ -118,6 +51,6 @@
     <button type="submit" id="submit-button" disabled>Start Scraping</button>
 </form>
 
-<p id="loading" style="display:none; color: blue;">Parsing... Please, wait 🌀</p>
+<p id="loading" style="display:none;">Parsing... Please, wait 🌀</p>
 </body>
 </html>

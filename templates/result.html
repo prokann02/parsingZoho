@@ -2,77 +2,21 @@
 <html>
 <head>
     <title>Zoho Scraper - Results</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fa;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-
-        h2 {
-            color: #34495e;
-            margin-top: 20px;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            margin: 10px 0;
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        button {
-            background-color: #8e44ad;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s;
-            margin-bottom: 20px;
-        }
-
-        button:hover {
-            background-color: #732d91;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
 <h1>Scraped Results</h1>
 
-<button onclick="window.location.href='/download_results'">Download Results</button>
+<button class="download-button" onclick="window.location.href='/download_results'">Download Results</button>
 {% if results %}
     <p>Results found!</p>
 {% else %}
     <p>No results found.</p>
 {% endif %}
 
+<a href="/">← Back</a>
+</body>
+</html>
 
 
 {#{% if results %}#}
@@ -91,7 +35,3 @@
 {#{% else %}#}
 {#    <p>No results found.</p>#}
 {#{% endif %}#}
-
-<a href="/">← Back</a>
-</body>
-</html>

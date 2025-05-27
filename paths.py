@@ -2,6 +2,8 @@ import pathlib
 
 ROOT_PATH = pathlib.Path(__file__).parent.absolute()
 
+STATIC = ROOT_PATH.joinpath("static")
+
 TEMPLATES = ROOT_PATH.joinpath("templates")
 TEMPLATES_FORM_HTML_ABSOLUTE = TEMPLATES.joinpath("form.html")
 TEMPLATES_RESULT_HTML_ABSOLUTE = TEMPLATES.joinpath("result.html")

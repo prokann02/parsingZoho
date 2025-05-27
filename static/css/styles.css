@@ -1,0 +1,133 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7fa;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: #34495e;
+}
+
+input[type="text"], input[type="checkbox"], input[type="radio"] {
+    margin: 5px 10px 5px 0;
+}
+
+input[type="text"] {
+    width: 100%;
+    max-width: 70%;
+    min-width: 25em;
+    padding: 10px;
+    border: 2px solid #3498db;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #2980b9;
+    outline: none;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+    margin: 5px;
+}
+
+button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+button:not(:disabled):hover {
+    background-color: #2980b9;
+}
+
+#select-all {
+    background-color: #27ae60;
+}
+
+#select-all:hover {
+    background-color: #219653;
+}
+
+#unselect-all {
+    background-color: #f1c40f;
+}
+
+#unselect-all:hover {
+    background-color: #d4ac0d;
+
+}
+
+#get-results, .download-button {
+    background-color: #e74c3c;
+}
+
+#get-results:not(:disabled):hover, .download-button:hover {
+    background-color: #c0392b;
+
+}
+
+#loading {
+    text-align: center;
+    font-size: 1.5em;
+    margin-top: 15px;
+    background-color: rgba(41, 128, 185, 0.4);
+    box-shadow: 0 0 20px rgba(41, 128, 185, 0.5);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
