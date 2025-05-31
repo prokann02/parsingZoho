@@ -18,7 +18,6 @@ While the application can technically parse other websites, it is specifically o
 - **Structured Data Extraction**: Parse page content into structured items (e.g., text chunks) using custom processing logic.
 - **Downloadable Results**: Download results as `scraped_zoho.json` from the results page.
 - **User Feedback**: Clear notifications for new links at each depth and error messages if no results or links are found.
-- **Responsive Design**: Clean, modern UI with intuitive controls (e.g., "Select All", "Get Results").
 
 ---
 
@@ -32,14 +31,14 @@ While the application can technically parse other websites, it is specifically o
 ---
 
 ## How It Works
-1. **Start Scraping**: Enter a URL and depth on the home page (`form.html`).
+1. **Start Scraping**: Enter a URL and depth on the Home page.
 2. **Initial Parse**: The app scrapes the starting page (depth 1), saving results to `scraped_zoho.json`.
-3. **Link Selection**: If internal links are found and depth > 1, users are redirected to `select_links.html` to choose links for the next depth, with a message like "New links found at depth X of Y".
+3. **Link Selection**: If internal links are found and depth > 1, users are redirected to Selecting Links page to choose links for the next depth, with a message like "New links found at depth X of Y".
 ![Zoho Scraper select_links](github/images/select_links.png)
 4. **Continue or Stop**:
-   - Click "Continue Scraping" to parse selected links, returning to `select_links.html` for more links or `scraped_zoho.json` if no links/depth remain.
-   - Click "Get Results" (available anytime `scraped_zoho.json` exists) to view results on `scraped_zoho.json`.
-5. **View/Download Results**: On `scraped_zoho.json`, view parsed data or download `scraped_zoho.json`. If no results/links are found, a message like "No results or links found" is displayed.
+   - Click "Continue Scraping" to parse selected links, returning to Selecting Links page for more links or Results page if no links/depth remain.
+   - Click "Get Results" to view results.
+5. **View/Download Results**: On Results page, view links where data were scraped or download `scraped_zoho.json` to get parsed data. If no results/links are found, a message like "No results or links found" is displayed.
 ![Zoho Scraper screenshot](github/images/get_results.png)
 ---
 
@@ -51,8 +50,8 @@ You can run Zoho Scraper in two ways:
 **Clone the Repository:**
 
 ```bash
-git clone https://github.com/prokann02/parsingZoho.git
-cd parsingZoho
+git clone https://github.com/prokann02/scrapingZoho.git
+cd scrapingZoho
 ```
 
 ---
