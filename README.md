@@ -1,14 +1,14 @@
-# Zoho Parser
+# Zoho Scraper
 
 ---
 
-Zoho Parser is a web scraping application built with FastAPI and Playwright to extract structured data from Zoho help pages (e.g., https://help.zoho.com/portal/en/kb/crm).
+Zoho Scraper is a web scraping application built with FastAPI and Playwright to extract structured data from Zoho help pages (e.g., https://help.zoho.com/portal/en/kb/crm).
 
 It provides an interactive web interface for scraping content, navigating internal links up to a specified depth, and downloading results as a JSON file.
 
 While the application can technically parse other websites, it is specifically optimized for Zoho help pages. As a result, the scraper is unlikely to find or extract meaningful data from non-Zoho websites due to its tailored parsing logic.
 
-![Zoho Parser start_app](github/images/run_app.png)
+![Zoho Scraper start_app](github/images/run_app.png)
 
 ---
 
@@ -35,16 +35,16 @@ While the application can technically parse other websites, it is specifically o
 1. **Start Scraping**: Enter a URL and depth on the home page (`form.html`).
 2. **Initial Parse**: The app scrapes the starting page (depth 1), saving results to `scraped_zoho.json`.
 3. **Link Selection**: If internal links are found and depth > 1, users are redirected to `select_links.html` to choose links for the next depth, with a message like "New links found at depth X of Y".
-![Zoho Parser select_links](github/images/select_links.png)
+![Zoho Scraper select_links](github/images/select_links.png)
 4. **Continue or Stop**:
    - Click "Continue Scraping" to parse selected links, returning to `select_links.html` for more links or `scraped_zoho.json` if no links/depth remain.
    - Click "Get Results" (available anytime `scraped_zoho.json` exists) to view results on `scraped_zoho.json`.
 5. **View/Download Results**: On `scraped_zoho.json`, view parsed data or download `scraped_zoho.json`. If no results/links are found, a message like "No results or links found" is displayed.
-![Zoho Parser screenshot](github/images/get_results.png)
+![Zoho Scraper screenshot](github/images/get_results.png)
 ---
 
 ## How to Run
-You can run Zoho Parser in two ways:
+You can run Zoho Scraper in two ways:
 - Option 1 (Recommended): Using Docker
 - Option 2: Using Python directly (Linux preferred; Windows may require additional setup)
 
@@ -65,13 +65,13 @@ Follow instructions at https://docs.docker.com/get-docker/
 2. Build the Docker Image:
 
 ```bash
-docker build -t zoho-parser .
+docker build -t zoho-Scraper .
 ```
 
 3. Run the Container:
 
 ```bash
-docker run -p 8000:8000 zoho-parser
+docker run -p 8000:8000 zoho-Scraper
 ```
 
 4. Access the Application:
