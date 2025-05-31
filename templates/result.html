@@ -3,33 +3,32 @@
 <head>
     <title>Zoho Scraper - Results</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 </head>
 <body>
-<h1>Scraped Results</h1>
+<div class="container">
+    <h1>Scraped Results</h1>
 
-<button class="download-button" onclick="window.location.href='/download_results'">Download Results</button>
-{% if results %}
-    <p>Found {{ results|length }} page(s) with content:</p>
-    <ul>
-        {% for result in results %}
-            <li>
-                <strong>URL:</strong> {{ result.url }}<br>
-                <strong>Items:</strong>
-                {% if result.items is iterable and not result.items is string %}
-                    {{ result.items|length }} chunk(s)
-                {% else %}
-                    Invalid or no items found
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No results found for the provided URL.</p>
-{% endif %}
-{% if error %}
-    <p class="error">{{ error }}</p>
-{% endif %}
 
-<a href="/">← Back</a>
+    <button class="download-button" onclick="window.location.href='/download_results'">Download Results</button>
+
+    {% if results %}
+        <h3 id="found-pages">Found {{ results|length }} page(s) with content:</h3>
+        <ul>
+            {% for result in results %}
+                <li>
+                    <strong>URL:</strong> <a href="{{ result.url }}">{{ result.url }}</a><br>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found for the provided URL.</p>
+    {% endif %}
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <a href="/">← Back</a>
+</div>
 </body>
 </html>

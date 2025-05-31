@@ -6,21 +6,21 @@
     <script>
         function buttonBlock() {
             const url = document.querySelector('input[name="url"]').value.trim();
-            const depthChecked = document.querySelector('input[name="depth"]:checked');
+            const depth = document.querySelector('input[name="depth"]').value;
             const submitButton = document.getElementById("submit-button");
 
             const isUrlFilled = url.length > 0;
-            const isDepthSelected = depthChecked !== null;
-            submitButton.disabled = !(isUrlFilled && isDepthSelected);
+            const isDepthValid = depth !== "" && Number.isInteger(Number(depth)) && Number(depth) >= 0 && Number(depth) <= 5;
+            submitButton.disabled = !(isUrlFilled && isDepthValid);
 
-            console.log("URL filled:", isUrlFilled, "Depth selected:", isDepthSelected, "Button disabled:", submitButton.disabled);
+            console.log("URL filled:", isUrlFilled, "Depth valid:", isDepthValid, "Button disabled:", submitButton.disabled);
         }
 
         function showLoading(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
             document.getElementById("submit-button").style.display = "none";
             document.getElementById("loading").style.display = "block";
-            document.forms[0].submit(); // Manually submit the form
+            document.forms[0].submit();
         }
 
         window.onload = function () {
@@ -28,10 +28,10 @@
             document.getElementById("loading").style.display = "none";
 
             const urlInput = document.querySelector('input[name="url"]');
-            const depthRadios = document.querySelectorAll('input[name="depth"]');
+            const depthInput = document.querySelector('input[name="depth"]');
 
             urlInput.addEventListener('input', buttonBlock);
-            depthRadios.forEach(radio => radio.addEventListener('change', buttonBlock));
+            depthInput.addEventListener('input', buttonBlock);
 
             buttonBlock();
         }
@@ -44,11 +44,8 @@
     <label>Start URL:</label><br>
     <input type="text" name="url" value="{{ url or '' }}"><br><br>
 
-    <label>Depth:</label><br>
-    <input type="radio" name="depth" value="0" {% if depth == 0 %}checked{% endif %}> Fast (only first page)<br>
-    <input type="radio" name="depth" value="1" {% if depth == 1 %}checked{% endif %}> Medium (first nesting)<br>
-    <input type="radio" name="depth" value="2" {% if depth == 2 or depth is none %}checked{% endif %}> Slow (to the second nesting)<br>
-    <input type="radio" name="depth" value="3" {% if depth == 3 %}checked{% endif %}> Very slow (to the third nesting)<br><br>
+    <label>Depth (0-5):</label><br>
+    <input type="number" name="depth" min="0" max="5" step="1" value="{{ depth or 0 }}"><br><br>
 
     <button type="submit" id="submit-button" disabled>Start Scraping</button>
 </form>
