@@ -81,7 +81,7 @@ Open http://localhost:8000 in your browser (http://0.0.0.0:8000).
 
 ### Option 2: Run with Python (Linux Only Recommended)
 
-Python 3.12 is required. Running on Windows may cause compatibility issues with Playwright.
+Python 3.10-3.12 is required. Running on Windows may cause compatibility issues with Playwright.
 
 1. Create Virtual Environment (Optional but Recommended)
 
