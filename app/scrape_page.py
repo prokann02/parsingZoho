@@ -19,23 +19,24 @@ async def scrape_page(url, browser, depth=1, visited=None):
         await page.wait_for_load_state("networkidle", timeout=10000)
         print(f"Scraping: {url}")
 
-        items = await extract_structured_items(page)
+        items, category = await extract_structured_items(page)
         print(f"[i] Extracted {len(items)} items for {url}")
 
         if items:
             scraped_data.append({
                 "url": url,
-                "items": items
+                "items": items,
+                "category": category,
             })
 
             # Save parted data to JSON file
             try:
-                with open("scraped_zoho2.json", "r", encoding="utf-8") as f:
+                with open("scraped_zoho.json", "r", encoding="utf-8") as f:
                     existing_data = json.load(f)
             except (FileNotFoundError, json.JSONDecodeError):
                 existing_data = []
             existing_data.extend(scraped_data)
-            with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
+            with open("scraped_zoho.json", "w", encoding="utf-8") as f:
                 json.dump(existing_data, f, ensure_ascii=False, indent=2)
         else:
             print(f"[i] Skipping content for hub page: {url}")

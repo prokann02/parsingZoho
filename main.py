@@ -22,10 +22,10 @@ async def form_page(request: Request):
 
 @app.post("/scrape", response_class=HTMLResponse)
 async def start_scrape(request: Request, url: str = Form(...), depth: int = Form(...)):
-    if not url or depth < 0:
+    if not url or not isinstance(depth, int) or depth < 0 or depth > 5:
         return templates.TemplateResponse(
             TEMPLATES_FORM_HTML,
-            {"request": request, "url": url, "depth": depth, "error": "Please provide a valid URL and depth"}
+            {"request": request, "url": url, "depth": depth, "error": "Please provide a valid URL and depth (0-5)"}
         )
 
     async with async_playwright() as p:
@@ -44,9 +44,10 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
         print(f"[i] Scraped {len(results)} pages, {sum(len(r['items']) for r in results) if results else 0} items")
         for result in results:
             print(f"[i] Page {result['url']} has {len(result['items'])} items")
+        print(f"[i] Results structure: {json.dumps(results, indent=2)}")
 
         # Save results to JSON even if empty
-        with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
+        with open("scraped_zoho.json", "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
 
         session_id = str(uuid.uuid4())
@@ -60,7 +61,6 @@ async def start_scrape(request: Request, url: str = Form(...), depth: int = Form
 
         print(f"[i] Depth: {depth}, Links found: {len(internal_links)}, Redirecting to: {'results' if depth == 0 or not internal_links else 'select_links'}")
 
-        # Always redirect to result.html for depth=0 or no links
         if depth == 0 or not internal_links:
             return templates.TemplateResponse(
                 TEMPLATES_RESULT_HTML,
@@ -101,7 +101,7 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
                     scrape_data = await scrape_page(link, browser=browser, depth=depth)
                     results.extend(scrape_data["results"])
                     new_internal_links.extend(scrape_data["links"])
-                    with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
+                    with open("scraped_zoho.json", "w", encoding="utf-8") as f:
                         json.dump(results, f, ensure_ascii=False, indent=2)
         except Exception as e:
             print(f"[!] Error in continue_scrape: {e}")
@@ -111,6 +111,7 @@ async def continue_scrape(request: Request, session_id: str = Form(...), selecte
     print(
         f"[i] After continuation at depth {current_depth}: {len(results)} pages, {sum(len(r['items']) for r in results) if results else 0} items")
     print(f"[i] Found {len(new_internal_links)} new internal links")
+    print(f"[i] Results structure: {json.dumps(results, indent=2)}")
 
     visited = {r["url"] for r in results}
     new_internal_links = list(dict.fromkeys([link for link in new_internal_links if link not in visited]))
@@ -149,7 +150,7 @@ async def stop_and_get_results(request: Request, session_id: str):
     results = session_data["results"]
     internal_links = session_data["links"]
 
-    with open("scraped_zoho2.json", "w", encoding="utf-8") as f:
+    with open("scraped_zoho.json", "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 
     del scraping_session[session_id]
@@ -159,15 +160,14 @@ async def stop_and_get_results(request: Request, session_id: str):
         {"request": request, "results": results, "links": internal_links}
     )
 
-
 @app.get("/download_results", response_class=FileResponse)
 async def download_results():
     try:
-        with open("scraped_zoho2.json", "r", encoding="utf-8") as f:
+        with open("scraped_zoho.json", "r", encoding="utf-8") as f:
             json.load(f)
         return FileResponse(
-            path="scraped_zoho2.json",
-            filename="scraped_zoho2.json",
+            path="scraped_zoho.json",
+            filename="scraped_zoho.json",
             media_type="application/json"
         )
     except (FileNotFoundError, json.JSONDecodeError):
@@ -175,3 +175,4 @@ async def download_results():
             TEMPLATES_RESULT_HTML,
             {"request": Request, "results": [], "links": [], "error": "No results available to download"}
         )
+
