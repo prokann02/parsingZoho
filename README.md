@@ -64,13 +64,13 @@ Follow instructions at https://docs.docker.com/get-docker/
 2. Build the Docker Image:
 
 ```bash
-docker build -t zoho-Scraper .
+docker build -t scraper .
 ```
 
 3. Run the Container:
 
 ```bash
-docker run -p 8000:8000 zoho-Scraper
+docker run -p 8000:8000 scraper
 ```
 
 4. Access the Application:
